@@ -6,49 +6,60 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:13 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/22 16:27:06 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/25 14:46:27 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHOLOSOPHER_H
-#define PHOLOSOPHER_H
+#include "philo.h"
 
-#include <stdio.h>
-#include <pthread.h>
 
-typedef struct s_philo
+int creat_philosopher(t_philo *philo, t_data *data)
 {
-   int thinking;
-   int hungry;
-   int eating;
-   int number_of_philo;
-    
-}   t_philo;
+    int i;
 
-#endif 
-
-//pthread lib
-/* pthread_create      
-pthread_create(&th1 a pass a pointer to pthread, NULL  the aittrubte of the thread,c the function ,NULL to pass arg to the function);
-
-*/
-void *c(void *add)
-{
-    long sum = 0;
-    long *add_num = (long *) (add);
-    printf("the num : %ld \n", *add_num);
-    return NULL;
-}
-int main()
-{
-    pthread_t th1;
-    pthread_t th2;
-    long val = 4;
-    long val1 = 6;
-    pthread_create(&th1, NULL,c,(void *) &val);
-    pthread_create(&th2, NULL,c,(void *) &val1);
-    
-    pthread_join(th1, NULL);
-    pthread_join(th2, NULL);    
+    i = 0;
+    while (i < data -> num_philo)
+    {
+        philo[i].id = i + 1;
+        philo[i].data = data;
+        philo[i].left_fork = &data -> forks[i];
+        philo[i].right_fork = &data -> forks[(i + 1) % data -> num_philo];
+        if(pthread_create(&philo[i].thread, NULL, routine, &philo[i]) != 0)
+            return 1;
+        i++;
+    }
     return 0;
+}
+
+int join_philo (t_philo *philo, t_data *data)
+{
+    int i;
+
+    i = 0;
+    while (i < data -> num_philo)
+    {
+        pthread_join(philo[i].thread, NULL);
+        i++;
+    }
+    return (0);
+}
+
+int	main(void)
+{
+	t_data	data;
+	t_philo	*philos;
+
+    data.start_time = get_time();
+    data.num_philo = 10;
+    if (craete_fork(&data))
+        return 1;
+    philos = malloc(sizeof(t_philo) * data.num_philo);
+	if(!philos)
+        return 1;
+	if (creat_philosopher(philos, &data))
+		return (1);
+
+	join_philo(philos, &data);
+    free(philos);
+	return (0);
 }
