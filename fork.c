@@ -6,40 +6,72 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/25 12:32:53 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/25 14:43:51 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/27 03:33:56 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	take_forks(t_philo *philo)
+void	fork_lock(t_fork *fork)
 {
-	if (philo->id % 2 == 0)
-	{
-		pthread_mutex_lock(philo->right_fork);
-        print_status(philo, "took right fork");
-		pthread_mutex_lock(philo->left_fork);
-        print_status(philo, "took left fork");
-	}
-	else
-	{
-		pthread_mutex_lock(philo->left_fork);
-        print_status(philo, "took left fork");
-		pthread_mutex_lock(philo->right_fork);
-        print_status(philo, "took right fork");
-	}
+    int	ticket;
+    int	serving;
+
+    pthread_mutex_lock(&fork->guard);
+    ticket = fork->next_ticket++;
+    pthread_mutex_unlock(&fork->guard);
+    while (1)
+    {
+        pthread_mutex_lock(&fork->guard);
+        serving = fork->now_serving;
+        pthread_mutex_unlock(&fork->guard);
+        if (serving == ticket)
+            break ;
+        usleep(200);
+    }
+    pthread_mutex_lock(&fork->held);
 }
+
+void	fork_unlock(t_fork *fork)
+{
+    pthread_mutex_unlock(&fork->held);
+    pthread_mutex_lock(&fork->guard);
+    fork->now_serving++;
+    pthread_mutex_unlock(&fork->guard);
+}
+
+void take_forks(t_philo *philo)
+{
+    if (philo->id == philo->data->num_philo)
+    {
+        fork_lock(philo->right_fork);
+        print_status(philo, "has taken a fork");
+        fork_lock(philo->left_fork);
+        print_status(philo, "has taken a fork");
+    }
+    else
+    {
+        fork_lock(philo->left_fork);
+        print_status(philo, "has taken a fork");
+        fork_lock(philo->right_fork);
+        print_status(philo, "has taken a fork");
+    }
+}
+
 int craete_fork(t_data *data)
 {
     int i;
-    
+
     i = 0;
-    data -> forks = malloc(sizeof(pthread_mutex_t) * data -> num_philo);
+    data -> forks = malloc(sizeof(t_fork) * data -> num_philo);
     if(!data -> forks)
         return (1);
     while(i < data -> num_philo)
     {
-        pthread_mutex_init(&data -> forks[i], NULL);
+        pthread_mutex_init(&data -> forks[i].held, NULL);
+        pthread_mutex_init(&data -> forks[i].guard, NULL);
+        data -> forks[i].next_ticket = 0;
+        data -> forks[i].now_serving = 0;
         i++;
     }
     return 0;
@@ -48,10 +80,10 @@ int one_philo(t_philo *philo)
 {
     if (philo ->data -> num_philo == 1)
     {
-        pthread_mutex_lock(philo -> left_fork);
-        printf("1 took a fork \n");
+        fork_lock(philo -> left_fork);
+        print_status(philo, "has taken a fork");
         usleep(philo -> data -> time_to_die * 1000);
-        pthread_mutex_unlock(philo -> left_fork);
+        fork_unlock(philo -> left_fork);
         return 1;
     }
     return 0;
@@ -59,12 +91,14 @@ int one_philo(t_philo *philo)
 
 void eat(t_philo *philo)
 {
-    print_status(philo, "is eating");
+    pthread_mutex_lock(&philo->meal_lock);
     philo -> last_meal = get_time();
     philo -> meal_eaten++;
+    pthread_mutex_unlock(&philo->meal_lock);
+    print_status(philo, "is eating");
     usleep(philo->data->time_to_eat * 1000);
-    pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+    fork_unlock(philo->left_fork);
+	fork_unlock(philo->right_fork);
 }
 
 void *routine(void *arg)
@@ -73,7 +107,7 @@ void *routine(void *arg)
     philo =arg;
     if(one_philo(philo))
         return (NULL);
-    while(1)
+    while(!get_dead(philo -> data))
     {
     print_status(philo, "is thinking");
     take_forks(philo);

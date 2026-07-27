@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/25 14:11:15 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/25 14:47:22 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/27 03:17:17 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,111 @@ long get_time(void)
 void print_status(t_philo *philo, char *status)
 {
     pthread_mutex_lock(&philo->data->print_lock);
-    printf("%ld %d %s\n", get_time() - philo-> data -> start_time, philo->id, status);
+    if (!get_dead(philo -> data))
+        printf("%ld %d %s\n", get_time() - philo-> data -> start_time, philo->id, status);
     pthread_mutex_unlock(&philo->data->print_lock);
+}
+int check_death(t_philo *philo)
+{
+    long current;
+    long last;
+    
+    current = get_time();
+    pthread_mutex_lock(&philo->meal_lock);
+    last = philo->last_meal;
+    pthread_mutex_unlock(&philo->meal_lock);
+    if(current - last >= philo ->data ->time_to_die)
+    {
+        if(get_dead(philo -> data))
+            return 1;
+        pthread_mutex_lock(&philo -> data -> print_lock);
+        printf("%ld %d died\n", current - philo -> data -> start_time, philo -> id);
+        pthread_mutex_unlock(&philo -> data -> print_lock);
+        pthread_mutex_lock(&philo -> data->dead_lock);
+        philo -> data -> dead = 1;
+        pthread_mutex_unlock(&philo -> data-> dead_lock);
+        return 1;
+    }
+    return 0;
+}
+
+static int	all_ate_enough(t_data *data)
+{
+    int	i;
+    int	eaten;
+
+    if (data->must_eat <= 0)
+        return (0);
+    i = 0;
+    while (i < data->num_philo)
+    {
+        pthread_mutex_lock(&data->philo[i].meal_lock);
+        eaten = data->philo[i].meal_eaten;
+        pthread_mutex_unlock(&data->philo[i].meal_lock);
+        if (eaten < data->must_eat)
+            return (0);
+        i++;
+    }
+    return (1);
+}
+
+void *monitor(void *arg)
+{
+    t_data *data;
+    int i;
+
+
+    data = arg;
+    while (!get_dead(data))
+    {
+        i = 0;
+        while(i < data -> num_philo)
+        {
+            if(check_death(&data -> philo[i]))
+                return NULL;
+            i++;
+        }
+        if (all_ate_enough(data))
+        {
+            pthread_mutex_lock(&data->dead_lock);
+            data->dead = 1;
+            pthread_mutex_unlock(&data->dead_lock);
+            return NULL;
+        }
+        usleep(1000);
+    }
+    return NULL;
+}
+
+int get_dead(t_data *data)
+{
+    int dead;
+    pthread_mutex_lock(&data->dead_lock);
+    dead = data->dead;
+    pthread_mutex_unlock(&data->dead_lock);
+    return dead;
+}
+int	ft_atoi(const char *nptr)
+{
+	int	i;
+	int	sign;
+	int	res;
+
+	i = 0;
+	sign = 1;
+	res = 0;
+	while (nptr[i] == ' ' || (nptr[i] >= 9 && nptr[i] <= 13))
+		i++;
+	if (nptr[i] == '-' || nptr[i] == '+')
+	{
+		if (nptr[i] == '-')
+			sign = -1;
+		i++;
+	}
+	while (nptr[i] >= '0' && nptr[i] <= '9')
+	{
+		res = res * 10 + (nptr[i] - '0');
+		i++;
+	}
+	return (res * sign);
 }
