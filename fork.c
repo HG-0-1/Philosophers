@@ -91,12 +91,18 @@ int one_philo(t_philo *philo)
 
 void eat(t_philo *philo)
 {
+    long new_time;
+
     pthread_mutex_lock(&philo->meal_lock);
     philo -> last_meal = get_time();
     philo -> meal_eaten++;
     pthread_mutex_unlock(&philo->meal_lock);
     print_status(philo, "is eating");
-    usleep(philo->data->time_to_eat * 1000);
+    new_time = get_time();
+
+    while(get_time() - new_time < (philo->data->time_to_eat)  && !philo ->data ->dead)
+        usleep(100);
+    
     fork_unlock(philo->left_fork);
 	fork_unlock(philo->right_fork);
 }
@@ -104,16 +110,21 @@ void eat(t_philo *philo)
 void *routine(void *arg)
 {
     t_philo *philo;
+    long new_time;
+
     philo =arg;
     if(one_philo(philo))
         return (NULL);
     while(!get_dead(philo -> data))
     {
-    print_status(philo, "is thinking");
-    take_forks(philo);
-    eat(philo);
-    print_status(philo, "is sleeping");
-    usleep(philo->data->time_to_sleep * 1000);
+        print_status(philo, "is thinking");
+        take_forks(philo);
+        eat(philo);
+        print_status(philo, "is sleeping");
+        new_time = get_time();
+
+        while(get_time() - new_time < (philo->data->time_to_sleep)  && !philo ->data ->dead)
+            usleep(100);
     }
     return (NULL);
 }
