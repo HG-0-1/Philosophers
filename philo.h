@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:17 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 12:24:49 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 13:18:00 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ typedef struct s_philo	t_philo;
 
 typedef struct s_fork
 {
-	pthread_mutex_t		held;
+	pthread_mutex_t		mutex;
+	int					id;
 }						t_fork;
 
 typedef struct s_data
