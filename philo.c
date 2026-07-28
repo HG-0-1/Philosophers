@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:13 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/27 03:20:51 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/27 23:47:23 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ int	main(int argc,char **argv)
     if(parse_args(&data, argc,argv))
         return 1;
     data.dead = 0;
-    data.start_time = get_time();
     pthread_mutex_init(&data.print_lock, NULL);
 	pthread_mutex_init(&data.dead_lock, NULL);
     if (craete_fork(&data))
@@ -89,6 +88,7 @@ int	main(int argc,char **argv)
 	if(!philos)
         return 1;
     data.philo = philos;
+    data.start_time = get_time();
 	if (creat_philosopher(philos, &data))
 		return (1);
     pthread_create(&monitor_thread, NULL, monitor, &data);
@@ -97,7 +97,6 @@ int	main(int argc,char **argv)
     for (int i = 0; i < data.num_philo; i++)
     {
         pthread_mutex_destroy(&data.forks[i].held);
-        pthread_mutex_destroy(&data.forks[i].guard);
         pthread_mutex_destroy(&philos[i].meal_lock);
     }
     pthread_mutex_destroy(&data.print_lock);

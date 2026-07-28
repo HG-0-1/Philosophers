@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/25 14:11:15 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/27 03:17:17 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/27 23:46:12 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,24 +31,36 @@ int check_death(t_philo *philo)
 {
     long current;
     long last;
-    
+
     current = get_time();
+
     pthread_mutex_lock(&philo->meal_lock);
     last = philo->last_meal;
     pthread_mutex_unlock(&philo->meal_lock);
-    if(current - last >= philo ->data ->time_to_die)
+
+    if (current - last > philo->data->time_to_die)
     {
-        if(get_dead(philo -> data))
-            return 1;
-        pthread_mutex_lock(&philo -> data -> print_lock);
-        printf("%ld %d died\n", current - philo -> data -> start_time, philo -> id);
-        pthread_mutex_unlock(&philo -> data -> print_lock);
-        pthread_mutex_lock(&philo -> data->dead_lock);
-        philo -> data -> dead = 1;
-        pthread_mutex_unlock(&philo -> data-> dead_lock);
-        return 1;
+        pthread_mutex_lock(&philo->data->dead_lock);
+
+        if (philo->data->dead)
+        {
+            pthread_mutex_unlock(&philo->data->dead_lock);
+            return (1);
+        }
+
+        philo->data->dead = 1;
+
+        pthread_mutex_unlock(&philo->data->dead_lock);
+
+        pthread_mutex_lock(&philo->data->print_lock);
+        printf("%ld %d died\n",
+            current - philo->data->start_time,
+            philo->id);
+        pthread_mutex_unlock(&philo->data->print_lock);
+
+        return (1);
     }
-    return 0;
+    return (0);
 }
 
 static int	all_ate_enough(t_data *data)
@@ -73,20 +85,11 @@ static int	all_ate_enough(t_data *data)
 
 void *monitor(void *arg)
 {
-    t_data *data;
+    t_data *data = arg;
     int i;
 
-
-    data = arg;
     while (!get_dead(data))
     {
-        i = 0;
-        while(i < data -> num_philo)
-        {
-            if(check_death(&data -> philo[i]))
-                return NULL;
-            i++;
-        }
         if (all_ate_enough(data))
         {
             pthread_mutex_lock(&data->dead_lock);
@@ -94,6 +97,15 @@ void *monitor(void *arg)
             pthread_mutex_unlock(&data->dead_lock);
             return NULL;
         }
+
+        i = 0;
+        while (i < data->num_philo)
+        {
+            if (check_death(&data->philo[i]))
+                return NULL;
+            i++;
+        }
+
         usleep(1000);
     }
     return NULL;
@@ -130,4 +142,21 @@ int	ft_atoi(const char *nptr)
 		i++;
 	}
 	return (res * sign);
+}
+void smart_sleep(long time, t_philo *philo)
+{
+    long start;
+    long remaining;
+
+    start = get_time();
+    while (!get_dead(philo->data))
+    {
+        remaining = time - (get_time() - start);
+        if (remaining <= 0)
+            break;
+        if (remaining > 5)
+            usleep(1000);
+        else
+            usleep(remaining * 1000 / 2 + 100);
+    }
 }

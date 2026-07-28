@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:17 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/27 03:15:35 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/27 19:45:11 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <sys/time.h> 
+#include <sys/time.h>
 
 typedef struct s_philo t_philo;
 
 typedef struct s_fork
 {
   pthread_mutex_t held;
-  pthread_mutex_t guard;
-  int next_ticket;
-  int now_serving;
 }   t_fork;
 
 typedef struct s_data
@@ -38,9 +35,11 @@ typedef struct s_data
   int time_to_eat;
   int time_to_sleep;
   int must_eat;
+  int finished_count;
   pthread_mutex_t print_lock;
   t_fork *forks;
   pthread_mutex_t dead_lock;
+  pthread_mutex_t finished_lock;
   t_philo *philo;
 }   t_data;
 
@@ -57,7 +56,7 @@ typedef struct s_philo
 
 }   t_philo;
 
-void	take_forks(t_philo *philo);
+int	take_forks(t_philo *philo);
 void	fork_lock(t_fork *fork);
 void	fork_unlock(t_fork *fork);
 int craete_fork(t_data *data);
@@ -67,6 +66,7 @@ void print_status(t_philo *philo, char *status);
 int check_death(t_philo *philo);
 void *monitor(void *arg);
 int get_dead(t_data *data);
+void smart_sleep(long time, t_philo *philo);
 int	ft_atoi(const char *nptr);
 
 #endif 
