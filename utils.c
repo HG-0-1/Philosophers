@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/25 14:11:15 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/27 23:46:12 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 15:06:01 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,14 +28,26 @@ void print_status(t_philo *philo, char *status)
     pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-int get_dead(t_data *data)
+int	is_valid_number(const char *str)
 {
-    int dead;
-    pthread_mutex_lock(&data->dead_lock);
-    dead = data->dead;
-    pthread_mutex_unlock(&data->dead_lock);
-    return dead;
+	int	i;
+
+	i = 0;
+	while (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
 }
+
 int	ft_atoi(const char *nptr)
 {
 	int	i;

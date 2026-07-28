@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/28 12:06:45 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 12:56:57 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 15:13:45 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,43 +16,30 @@ int	one_philo(t_philo *philo)
 {
 	if (philo->data->num_philo == 1)
 	{
-		fork_lock(philo->left_fork);
+		fork_lock(philo->left_fork, philo->data);
 		print_status(philo, "has taken a fork");
 		usleep(philo->data->time_to_die * 1000);
-		fork_unlock(philo->left_fork);
+		fork_unlock(philo->left_fork, philo->data);
 		return (1);
 	}
 	return (0);
 }
 
-int	check_death(t_philo *philo)
+int	check_args(int argc, char **argv)
 {
-	long	current;
-	long	last;
+	int	i;
 
-	current = get_time();
-	pthread_mutex_lock(&philo->meal_lock);
-	last = philo->last_meal;
-	pthread_mutex_unlock(&philo->meal_lock);
-	if (current - last > philo->data->time_to_die)
+	i = 1;
+	while (i < argc)
 	{
-		pthread_mutex_lock(&philo->data->dead_lock);
-		if (philo->data->dead)
-		{
-			pthread_mutex_unlock(&philo->data->dead_lock);
+		if (!is_valid_number(argv[i]))
 			return (1);
-		}
-		philo->data->dead = 1;
-		pthread_mutex_unlock(&philo->data->dead_lock);
-		pthread_mutex_lock(&philo->data->print_lock);
-		printf("%ld %d died\n", current - philo->data->start_time, philo->id);
-		pthread_mutex_unlock(&philo->data->print_lock);
-		return (1);
+		i++;
 	}
 	return (0);
 }
 
-static int	all_ate_enough(t_data *data)
+int	all_ate_enough(t_data *data)
 {
 	int	i;
 	int	eaten;
