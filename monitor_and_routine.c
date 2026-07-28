@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/28 12:06:45 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 12:11:09 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 12:56:57 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,12 +109,15 @@ void	*routine(void *arg)
 	pthread_mutex_unlock(&philo->meal_lock);
 	if (one_philo(philo))
 		return (NULL);
-	usleep((philo->id % 20) * 300);
+	if (philo->id % 2 == 0)
+		usleep(300);
 	while (!get_dead(philo->data))
 	{
 		print_status(philo, "is thinking");
+		// check if the simulation has ended or not
 		take_forks(philo);
 		eat(philo);
+		// check if the simulation has ended or not
 		print_status(philo, "is sleeping");
 		smart_sleep(philo->data->time_to_sleep, philo);
 	}

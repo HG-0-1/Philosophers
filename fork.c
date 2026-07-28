@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/25 12:32:53 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 12:07:57 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 13:07:14 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,21 @@ int	take_forks(t_philo *philo)
 {
 	if (philo->id == philo->data->num_philo)
 	{
+		//check if the simulation has ended or not
 		fork_lock(philo->right_fork);
 		print_status(philo, "has taken a fork");
+		//check if the simulation has ended or not
 		fork_lock(philo->left_fork);
 		print_status(philo, "has taken a fork");
 	}
 	else
 	{
+				//check if the simulation has ended or not
+
 		fork_lock(philo->left_fork);
 		print_status(philo, "has taken a fork");
+		//check if the simulation has ended or not
+
 		fork_lock(philo->right_fork);
 		print_status(philo, "has taken a fork");
 	}

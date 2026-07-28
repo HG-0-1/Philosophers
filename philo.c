@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:13 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 12:23:53 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 12:44:26 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,44 +70,6 @@ int	parse_args(t_data *data, int argc, char **argv)
 		return (1);
 	return (0);
 }
-
-// int	main(int argc, char **argv)
-// {
-// 	t_data		data;
-// 	t_philo		*philos;
-// 	pthread_t	monitor_thread;
-// 	int			i;
-
-// 	i = 0;
-// 	if (parse_args(&data, argc, argv))
-// 		return (1);
-// 	data.dead = 0;
-// 	pthread_mutex_init(&data.print_lock, NULL);
-// 	pthread_mutex_init(&data.dead_lock, NULL);
-// 	if (craete_fork(&data))
-// 		return (1);
-// 	philos = malloc(sizeof(t_philo) * data.num_philo);
-// 	if (!philos)
-// 		return (1);
-// 	data.philo = philos;
-// 	data.start_time = get_time();
-// 	if (creat_philosopher(philos, &data))
-// 		return (1);
-// 	pthread_create(&monitor_thread, NULL, monitor, &data);
-// 	join_philo(philos, &data);
-// 	pthread_join(monitor_thread, NULL);
-// 	while (i < data.num_philo)
-// 	{
-// 		pthread_mutex_destroy(&data.forks[i].held);
-// 		pthread_mutex_destroy(&philos[i].meal_lock);
-// 		i++;
-// 	}
-// 	pthread_mutex_destroy(&data.print_lock);
-// 	pthread_mutex_destroy(&data.dead_lock);
-// 	free(philos);
-// 	free(data.forks);
-// 	return (0);
-// }
 
 static int	init_data(t_data *data, t_philo **philos,
 		int argc, char **argv)

@@ -12,33 +12,30 @@
 
 #include "philo.h"
 
-long	get_time(void)
+long get_time(void)
 {
-	struct timeval	tv;
+    struct timeval tv;
 
-	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
 
-void	print_status(t_philo *philo, char *status)
+void print_status(t_philo *philo, char *status)
 {
-	pthread_mutex_lock(&philo->data->print_lock);
-	if (!get_dead(philo->data))
-		printf("%ld %d %s\n", get_time() - philo->data->start_time, philo->id,
-			status);
-	pthread_mutex_unlock(&philo->data->print_lock);
+    pthread_mutex_lock(&philo->data->print_lock);
+    if (!get_dead(philo -> data))
+        printf("%ld %d %s\n", get_time() - philo-> data -> start_time, philo->id, status);
+    pthread_mutex_unlock(&philo->data->print_lock);
 }
 
-int	get_dead(t_data *data)
+int get_dead(t_data *data)
 {
-	int	dead;
-
-	pthread_mutex_lock(&data->dead_lock);
-	dead = data->dead;
-	pthread_mutex_unlock(&data->dead_lock);
-	return (dead);
+    int dead;
+    pthread_mutex_lock(&data->dead_lock);
+    dead = data->dead;
+    pthread_mutex_unlock(&data->dead_lock);
+    return dead;
 }
-
 int	ft_atoi(const char *nptr)
 {
 	int	i;
@@ -63,21 +60,20 @@ int	ft_atoi(const char *nptr)
 	}
 	return (res * sign);
 }
-
-void	smart_sleep(long time, t_philo *philo)
+void smart_sleep(long time, t_philo *philo)
 {
-	long	start;
-	long	remaining;
+    long start;
+    long remaining;
 
-	start = get_time();
-	while (!get_dead(philo->data))
-	{
-		remaining = time - (get_time() - start);
-		if (remaining <= 0)
-			break ;
-		if (remaining > 5)
-			usleep(1000);
-		else
-			usleep(remaining * 1000 / 2 + 100);
-	}
+    start = get_time();
+    while (!get_dead(philo->data))
+    {
+        remaining = time - (get_time() - start);
+        if (remaining <= 0)
+            break;
+        if (remaining > 5)
+            usleep(1000);
+        else
+            usleep(remaining * 1000 / 2 + 100);
+    }
 }

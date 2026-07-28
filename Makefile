@@ -1,25 +1,26 @@
-NAME     = philo
+NAME	= philo
 
-CC       = cc
-CFLAGS   = -Wall -Wextra -Werror
+CC		= cc
+FLAGS	= -pthread -Wall -Wextra -Werror
 
-SRC      = philo.c fork.c utils.c monitor_and_routine.c
-OBJ      = $(SRC:.c=.o)
+SRCS	= fork.c utils.c philo.c monitor_and_routine.c
+OBJS	= $(SRCS:.c=.o)
+
+.PHONY: all clean fclean re
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME)
+$(NAME): $(OBJS)
+	$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
-%.o: %.c philo.h
-	$(CC) $(CFLAGS) -c $< -o $@
+%.o: %.c philosophers.h
+	$(CC) $(FLAGS) -c $< -o $@
+
 
 clean:
-	rm -f $(OBJ)
+	rm -f $(OBJS)
 
 fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
-
-.PHONY: all clean fclean re
