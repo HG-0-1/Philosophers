@@ -39,6 +39,7 @@ typedef struct s_data
 	int					finished_count;
 	pthread_mutex_t		print_lock;
 	t_fork				*forks;
+	pthread_mutex_t		forks_lock;
 	pthread_mutex_t		dead_lock;
 	pthread_mutex_t		finished_lock;
 	t_philo				*philo;

@@ -14,36 +14,42 @@
 
 void	fork_lock(t_fork *fork)
 {
-	pthread_mutex_lock(&fork->held);
+	pthread_mutex_lock(&fork->mutex);
 }
 
 void	fork_unlock(t_fork *fork)
 {
-	pthread_mutex_unlock(&fork->held);
+	pthread_mutex_unlock(&fork->mutex);
 }
 
 int	take_forks(t_philo *philo)
 {
+	t_fork	*first;
+	t_fork	*second;
+
 	if (philo->id == philo->data->num_philo)
 	{
-		//check if the simulation has ended or not
-		fork_lock(philo->right_fork);
-		print_status(philo, "has taken a fork");
-		//check if the simulation has ended or not
-		fork_lock(philo->left_fork);
-		print_status(philo, "has taken a fork");
+		first = philo->right_fork;
+		second = philo->left_fork;
 	}
 	else
 	{
-				//check if the simulation has ended or not
-
-		fork_lock(philo->left_fork);
-		print_status(philo, "has taken a fork");
-		//check if the simulation has ended or not
-
-		fork_lock(philo->right_fork);
-		print_status(philo, "has taken a fork");
+		first = philo->left_fork;
+		second = philo->right_fork;
 	}
+	if (get_dead(philo->data))
+		return (1);
+	pthread_mutex_lock(&philo->data->forks_lock);
+	if (get_dead(philo->data))
+	{
+		pthread_mutex_unlock(&philo->data->forks_lock);
+		return (1);
+	}
+	pthread_mutex_lock(&first->mutex);
+	pthread_mutex_lock(&second->mutex);
+	pthread_mutex_unlock(&philo->data->forks_lock);
+	print_status(philo, "has taken a fork");
+	print_status(philo, "has taken a fork");
 	return (0);
 }
 
@@ -57,7 +63,7 @@ int	craete_fork(t_data *data)
 		return (1);
 	while (i < data->num_philo)
 	{
-		pthread_mutex_init(&data->forks[i].held, NULL);
+		pthread_mutex_init(&data->forks[i].mutex, NULL);
 		i++;
 	}
 	return (0);

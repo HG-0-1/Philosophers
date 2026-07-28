@@ -114,10 +114,9 @@ void	*routine(void *arg)
 	while (!get_dead(philo->data))
 	{
 		print_status(philo, "is thinking");
-		// check if the simulation has ended or not
-		take_forks(philo);
+		if (take_forks(philo))
+			break ;
 		eat(philo);
-		// check if the simulation has ended or not
 		print_status(philo, "is sleeping");
 		smart_sleep(philo->data->time_to_sleep, philo);
 	}

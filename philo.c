@@ -78,6 +78,7 @@ static int	init_data(t_data *data, t_philo **philos,
 		return (1);
 	data->dead = 0;
 	pthread_mutex_init(&data->print_lock, NULL);
+	pthread_mutex_init(&data->forks_lock, NULL);
 	pthread_mutex_init(&data->dead_lock, NULL);
 	if (craete_fork(data))
 		return (1);
@@ -107,11 +108,12 @@ int	main(int argc, char **argv)
 
 	while (i < data.num_philo)
 	{
-		pthread_mutex_destroy(&data.forks[i].held);
+		pthread_mutex_destroy(&data.forks[i].mutex);
 		pthread_mutex_destroy(&philos[i].meal_lock);
 		i++;
 	}
 	pthread_mutex_destroy(&data.print_lock);
+	pthread_mutex_destroy(&data.forks_lock);
 	pthread_mutex_destroy(&data.dead_lock);
 	free(philos);
 	free(data.forks);
