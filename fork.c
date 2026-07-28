@@ -37,10 +37,6 @@ long	time_since_meal(t_philo *philo, long now)
 	return (now - last);
 }
 
-
-
-
-
 int	take_forks(t_philo *philo)
 {
 	t_data			*data;
@@ -83,5 +79,3 @@ int	craete_fork(t_data *data)
 	}
 	return (0);
 }
-
-

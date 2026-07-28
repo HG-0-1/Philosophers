@@ -74,13 +74,12 @@ void					smart_sleep(long time, t_philo *philo);
 int						ft_atoi(const char *nptr);
 int						is_valid_number(const char *str);
 void					eat(t_philo *philo);
-void	next_deadline(struct timespec *ts);
-int	is_hungriest(t_philo *philo);
-int	all_ate_enough(t_data *data);
-int	init_data(t_data *data, t_philo **philos,
-		int argc, char **argv);
-		int	check_args(int argc, char **argv);
-		long	time_since_meal(t_philo *philo, long now);
-		
+void					next_deadline(struct timespec *ts);
+int						is_hungriest(t_philo *philo);
+int						all_ate_enough(t_data *data);
+int						init_data(t_data *data, t_philo **philos, int argc,
+							char **argv);
+int						check_args(int argc, char **argv);
+long					time_since_meal(t_philo *philo, long now);
 
 #endif

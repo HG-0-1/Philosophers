@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:13 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 15:12:08 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 15:20:21 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,6 @@ int	join_philo(t_philo *philo, t_data *data)
 	return (0);
 }
 
-
-
 int	parse_args(t_data *data, int argc, char **argv)
 {
 	if (argc != 5 && argc != 6)
@@ -80,8 +78,7 @@ int	parse_args(t_data *data, int argc, char **argv)
 	return (0);
 }
 
-int	init_data(t_data *data, t_philo **philos,
-		int argc, char **argv)
+int	init_data(t_data *data, t_philo **philos, int argc, char **argv)
 {
 	if (parse_args(data, argc, argv))
 		return (1);
@@ -101,14 +98,15 @@ int	init_data(t_data *data, t_philo **philos,
 		return (1);
 	return (0);
 }
+
 int	main(int argc, char **argv)
 {
 	t_data		data;
 	t_philo		*philos;
 	pthread_t	monitor_thread;
- 	int			i;
+	int			i;
 
- 	i = 0;
+	i = 0;
 	if (init_data(&data, &philos, argc, argv))
 		return (1);
 	pthread_create(&monitor_thread, NULL, monitor, &data);

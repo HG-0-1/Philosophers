@@ -6,20 +6,22 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/28 15:06:04 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 15:09:55 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/28 15:19:35 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int get_dead(t_data *data)
+int	get_dead(t_data *data)
 {
-    int dead;
-    pthread_mutex_lock(&data->dead_lock);
-    dead = data->dead;
-    pthread_mutex_unlock(&data->dead_lock);
-    return dead;
+	int	dead;
+
+	pthread_mutex_lock(&data->dead_lock);
+	dead = data->dead;
+	pthread_mutex_unlock(&data->dead_lock);
+	return (dead);
 }
+
 int	check_death(t_philo *philo)
 {
 	long	current;
@@ -46,6 +48,7 @@ int	check_death(t_philo *philo)
 	}
 	return (0);
 }
+
 void	next_deadline(struct timespec *ts)
 {
 	struct timeval	tv;
@@ -56,6 +59,7 @@ void	next_deadline(struct timespec *ts)
 	ts->tv_sec = tv.tv_sec + total_us / 1000000;
 	ts->tv_nsec = (total_us % 1000000) * 1000;
 }
+
 void	eat(t_philo *philo)
 {
 	pthread_mutex_lock(&philo->meal_lock);
@@ -67,6 +71,7 @@ void	eat(t_philo *philo)
 	fork_unlock(philo->left_fork, philo->data);
 	fork_unlock(philo->right_fork, philo->data);
 }
+
 int	is_hungriest(t_philo *philo)
 {
 	t_data	*data;
