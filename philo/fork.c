@@ -23,7 +23,6 @@ void	fork_unlock(t_fork *fork, t_data *data)
 {
 	pthread_mutex_lock(&data->table_lock);
 	fork->in_use = 0;
-	pthread_cond_broadcast(&data->table_cond);
 	pthread_mutex_unlock(&data->table_lock);
 }
 
@@ -39,16 +38,16 @@ long	time_since_meal(t_philo *philo, long now)
 
 int	take_forks(t_philo *philo)
 {
-	t_data			*data;
-	struct timespec	ts;
+	t_data	*data;
 
 	data = philo->data;
 	pthread_mutex_lock(&data->table_lock);
 	while (!get_dead(data) && (philo->left_fork->in_use
 			|| philo->right_fork->in_use || !is_hungriest(philo)))
 	{
-		next_deadline(&ts);
-		pthread_cond_timedwait(&data->table_cond, &data->table_lock, &ts);
+		pthread_mutex_unlock(&data->table_lock);
+		usleep(500);
+		pthread_mutex_lock(&data->table_lock);
 	}
 	if (get_dead(data))
 	{

@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:13 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 15:20:21 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/29 13:08:03 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,33 +51,6 @@ int	join_philo(t_philo *philo, t_data *data)
 	return (0);
 }
 
-int	parse_args(t_data *data, int argc, char **argv)
-{
-	if (argc != 5 && argc != 6)
-		return (1);
-	if (check_args(argc, argv))
-		return (1);
-	data->num_philo = ft_atoi(argv[1]);
-	if (data->num_philo <= 0)
-		return (1);
-	data->time_to_die = ft_atoi(argv[2]);
-	if (data->time_to_die <= 0)
-		return (1);
-	data->time_to_eat = ft_atoi(argv[3]);
-	if (data->time_to_eat <= 0)
-		return (1);
-	data->time_to_sleep = ft_atoi(argv[4]);
-	if (data->time_to_sleep <= 0)
-		return (1);
-	if (argc == 6)
-		data->must_eat = ft_atoi(argv[5]);
-	else
-		data->must_eat = -1;
-	if (argc == 6 && data->must_eat <= 0)
-		return (1);
-	return (0);
-}
-
 int	init_data(t_data *data, t_philo **philos, int argc, char **argv)
 {
 	if (parse_args(data, argc, argv))
@@ -85,7 +58,6 @@ int	init_data(t_data *data, t_philo **philos, int argc, char **argv)
 	data->dead = 0;
 	pthread_mutex_init(&data->print_lock, NULL);
 	pthread_mutex_init(&data->table_lock, NULL);
-	pthread_cond_init(&data->table_cond, NULL);
 	pthread_mutex_init(&data->dead_lock, NULL);
 	if (craete_fork(data))
 		return (1);
@@ -119,7 +91,6 @@ int	main(int argc, char **argv)
 	}
 	pthread_mutex_destroy(&data.print_lock);
 	pthread_mutex_destroy(&data.table_lock);
-	pthread_cond_destroy(&data.table_cond);
 	pthread_mutex_destroy(&data.dead_lock);
 	free(philos);
 	free(data.forks);

@@ -6,7 +6,7 @@
 /*   By: helfayez <helfayez@student.42amman.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/22 15:11:17 by helfayez          #+#    #+#             */
-/*   Updated: 2026/07/28 15:14:52 by helfayez         ###   ########.fr       */
+/*   Updated: 2026/07/29 14:15:48 by helfayez         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ typedef struct s_data
 	pthread_mutex_t		print_lock;
 	t_fork				*forks;
 	pthread_mutex_t		table_lock;
-	pthread_cond_t		table_cond;
 	pthread_mutex_t		dead_lock;
 	pthread_mutex_t		finished_lock;
 	t_philo				*philo;
@@ -74,12 +73,14 @@ void					smart_sleep(long time, t_philo *philo);
 int						ft_atoi(const char *nptr);
 int						is_valid_number(const char *str);
 void					eat(t_philo *philo);
-void					next_deadline(struct timespec *ts);
 int						is_hungriest(t_philo *philo);
 int						all_ate_enough(t_data *data);
 int						init_data(t_data *data, t_philo **philos, int argc,
 							char **argv);
 int						check_args(int argc, char **argv);
 long					time_since_meal(t_philo *philo, long now);
+int						is_done(t_data *data, t_philo *philo);
+int						parse_args(t_data *data, int argc, char **argv);
+int						handle_death(t_philo *philo, long current);
 
 #endif
